@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS `realm` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(32) NOT NULL,
-  `description` VARCHAR(255),
-  `key` CHAR(32),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE UNIQUE INDEX IF NOT EXISTS unique_name ON realm(name);

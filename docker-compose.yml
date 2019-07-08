@@ -1,22 +1,30 @@
-version: '2.1'
-
+version: '3.7'
 services:
-  demo-mysql:
-    image: mysql:latest
+  bright-api-service:
+    image: m1ky91/bright-api
+    ports:
+      - 8081:8080
+    depends_on:
+      - bright-api-database
+    networks:
+      bright-api-network:
+        aliases:
+          - bright-api-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bright-api-database/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+  bright-api-database:
+    image: mysql:8.0.14
+    networks:
+      bright-api-network:
+        aliases:
+          - bright-api-database
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-  bright-api:
-    image: m1ky91/bright-api
-    depends_on:
-      - demo-mysql
-    ports:
-      - 8080:8080
-    environment:
-      - DATABASE_HOST=${MYSQL_HOST}
-      - DATABASE_USER=${MYSQL_USER}
-      - DATABASE_PASSWORD=${MYSQL_PASSWORD}
-      - DATABASE_NAME=${MYSQL_DATABASE}
-      - DATABASE_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ONETIME_PASSWORD=true
+networks:
+  bright-api-network:
