@@ -15,12 +15,3 @@ spring:
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
 initialize: true
----
-spring:
-  profiles: test
-  datasource:
-    url: jdbc:hsqldb:mem:brightdb;DB_CLOSE_DELAY=-1
-    username: root
-    password: password
-  jpa:
-    database-platform: org.hibernate.dialect.HSQLDialect

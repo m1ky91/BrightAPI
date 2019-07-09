@@ -1,55 +1,89 @@
 package it.micheledichio.brightapi.resource;
 
+import it.micheledichio.brightapi.BrightApiApplication;
 import it.micheledichio.brightapi.dto.RealmDto;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(UserResource.class)
+@AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 public class UserResourceIT {
 
-    private RealmDto realm;
+    private RealmDto realm, realmNotValid;
 
     @Autowired
     private MockMvc mockMvc;
 
-    public RealmDto createDto() {
+    private RealmDto createValidDto() {
         RealmDto realm = new RealmDto();
         realm.setId(1L);
+        realm.setName("test");
+        return realm;
+    }
+
+    private RealmDto createNotValidDto() {
+        RealmDto realm = new RealmDto();
         return realm;
     }
 
     @BeforeAll
     public void initTests() {
-        realm = createDto();
+        realm = createValidDto();
+        realmNotValid = createNotValidDto();
     }
 
     @Test
-    public void getUserRealm() throws Exception {
+    @DisplayName("Get request for a user realm is performed correcly for Content-Type JSON")
+    public void getUserRealm_contentTypeJSON() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/service/user/realm/{id}", realm.getId()))
-                .andExpect(status().isOk());
+                MockMvcRequestBuilders.get("/service/user/realm/{id}", realm.getId())
+                    .accept(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(ResourceUtil.asJsonString(realm)));;
     }
 
     @Test
-    public void createUserRealm() throws Exception {
-        mockMvc.perform( MockMvcRequestBuilders
-                .post("/service/user/realm")
-                .content(ResourceUtil.asJsonString(realm))
-                .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
+    @DisplayName("Get request for a user realm is performed correcly for Content-Type XML")
+    public void getUserRealm_contentTypeXML() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/service/user/realm/{id}", realm.getId())
+                    .accept(ResourceUtil.APPLICATION_XML))
+                .andExpect(status().isOk())
+                .andExpect(content().string(ResourceUtil.asXmlString(realm)));
+    }
+
+    @Test
+    @DisplayName("Post request for a user realm is performed correcly for Content-Type JSON")
+    public void createUserRealm_contentTypeJSON() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/service/user/realm")
+                    .content(ResourceUtil.asJsonString(realm))
+                    .accept(ResourceUtil.APPLICATION_JSON_UTF8)
+                    .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("Bad request after a post request if the mandatory realm name is not supplied")
+    public void createUserRealm_withoutRealmName() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/service/user/realm")
+                    .content(ResourceUtil.asJsonString(realmNotValid))
+                    .accept(ResourceUtil.APPLICATION_JSON_UTF8)
+                    .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest());
     }
 
 }

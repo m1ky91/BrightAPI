@@ -18,6 +18,7 @@
 		<java.version>1.8</java.version>
 		<docker.baseDir>src/main/docker</docker.baseDir>
 		<mapstruct.version>1.0.0.Final</mapstruct.version>
+		<jackson.dataformat.xml.version>2.9.8</jackson.dataformat.xml.version>
 	</properties>
 
 	<dependencies>
@@ -53,6 +54,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -69,6 +76,11 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>${jackson.dataformat.xml.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
