@@ -1,12 +1,10 @@
 package it.micheledichio.brightapi.resource;
 
-import it.micheledichio.brightapi.BrightApiApplication;
 import it.micheledichio.brightapi.dto.RealmDto;
 import it.micheledichio.brightapi.service.RealmService;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = BrightApiApplication.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
 @ActiveProfiles("test")
 public class UserResourceTests {
 
@@ -37,7 +34,7 @@ public class UserResourceTests {
         return realm;
     }
 
-    @BeforeAll
+    @BeforeEach
     public void initTests() {
         realm = createValidDto();
     }
