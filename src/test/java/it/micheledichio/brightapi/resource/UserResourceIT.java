@@ -1,5 +1,6 @@
 package it.micheledichio.brightapi.resource;
 
+import it.micheledichio.brightapi.dto.Error;
 import it.micheledichio.brightapi.dto.RealmDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,6 +66,16 @@ public class UserResourceIT {
     }
 
     @Test
+    @DisplayName("Bad request after a get request if the requested realm id is not an integer value")
+    public void getUserRealm_idIsNotAnIntegerValue() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/service/user/realm/{id}", realm.getName())
+                        .accept(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(ResourceUtil.asJsonString(new Error("InvalidArgument"))));
+    }
+
+    @Test
     @DisplayName("Post request for a user realm is performed correcly for Content-Type JSON")
     public void createUserRealm_contentTypeJSON() throws Exception {
         mockMvc.perform(
@@ -83,6 +94,7 @@ public class UserResourceIT {
                     .content(ResourceUtil.asJsonString(realmNotValid))
                     .accept(ResourceUtil.APPLICATION_JSON_UTF8)
                     .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(ResourceUtil.asJsonString(new Error("InvalidRealmName"))))
                 .andExpect(status().isBadRequest());
     }
 
