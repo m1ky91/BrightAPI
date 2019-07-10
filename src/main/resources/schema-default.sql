@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS realm (
+  id BIGINT GENERATED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(32) NOT NULL,
+  description VARCHAR(255),
+  key CHAR(32)
+);
+
+CREATE UNIQUE INDEX unique_name
+ON realm (name);

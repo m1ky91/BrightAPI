@@ -46,6 +46,14 @@ public class RealmRepositoryIT {
     }
 
     @Test
+    @DisplayName("Find a user realm by name and check the entity returned")
+    public void findUserRealmByName() {
+        Optional<Realm> realm = realmRepository.findByName("testThree");
+        assertTrue(realm.isPresent());
+        assertThat(realm.get().getName()).isEqualTo(realmThree.getName());
+    }
+
+    @Test
     @DisplayName("Save a realm entity and check the new size")
     public void createUserRealm() {
         Realm realm = realmRepository.save(new Realm());

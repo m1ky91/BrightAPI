@@ -1,5 +1,6 @@
 package it.micheledichio.brightapi.resource;
 
+import it.micheledichio.brightapi.dto.Error;
 import it.micheledichio.brightapi.dto.RealmDto;
 import it.micheledichio.brightapi.service.RealmService;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -21,16 +23,28 @@ public class UserResource {
 
     @GetMapping(value = "/realm/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<RealmDto> getUserRealm(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(realmService.getById(id), HttpStatus.OK);
+    public ResponseEntity<?> getUserRealm(@PathVariable("id") Long id) {
+        Optional<RealmDto> realmDto = realmService.getById(id);
+
+        if (realmDto.isPresent()) {
+            return new ResponseEntity<>(realmDto.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new Error("RealmNotFound"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping(
             value = "/realm",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<RealmDto> createUserRealm (@RequestBody @Valid RealmDto realm) {
-        return new ResponseEntity<>(new RealmDto(), HttpStatus.CREATED);
+    public ResponseEntity<?> createUserRealm (@RequestBody @Valid RealmDto realm) {
+        Optional<RealmDto> realmDto = realmService.create(realm);
+
+        if (realmDto.isPresent()) {
+            return new ResponseEntity<>(realmDto.get(), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(new Error("DuplicateRealmName"), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.DigestUtils;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +32,8 @@ public class UserResourceIT {
         RealmDto realm = new RealmDto();
         realm.setId(1L);
         realm.setName("test");
+        String digest = DigestUtils.md5DigestAsHex(realm.getName().getBytes());
+        realm.setKey(digest);
         return realm;
     }
 
@@ -76,6 +79,16 @@ public class UserResourceIT {
     }
 
     @Test
+    @DisplayName("Not found after a get request if the realm id does not identify an existing realm")
+    public void getUserRealm_idDoesNotExists() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/service/user/realm/{id}", 10L)
+                        .accept(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(ResourceUtil.asJsonString(new Error("RealmNotFound"))));
+    }
+
+    @Test
     @DisplayName("Post request for a user realm is performed correcly for Content-Type JSON")
     public void createUserRealm_contentTypeJSON() throws Exception {
         mockMvc.perform(
@@ -91,10 +104,23 @@ public class UserResourceIT {
     public void createUserRealm_withoutRealmName() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/service/user/realm")
-                    .content(ResourceUtil.asJsonString(realmNotValid))
-                    .accept(ResourceUtil.APPLICATION_JSON_UTF8)
-                    .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
+                        .content(ResourceUtil.asJsonString(realmNotValid))
+                        .accept(ResourceUtil.APPLICATION_JSON_UTF8)
+                        .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string(ResourceUtil.asJsonString(new Error("InvalidRealmName"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Bad request after a post request if the mandatory realm name matches the name of an existing realm")
+    public void createUserRealm_withAnExistingRealmName() throws Exception {
+        // User created already with createUserRealm_contentTypeJSON
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/service/user/realm")
+                        .content(ResourceUtil.asJsonString(realm))
+                        .accept(ResourceUtil.APPLICATION_JSON_UTF8)
+                        .contentType(ResourceUtil.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(ResourceUtil.asJsonString(new Error("DuplicateRealmName"))))
                 .andExpect(status().isBadRequest());
     }
 
