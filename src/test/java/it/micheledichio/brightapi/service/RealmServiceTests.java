@@ -3,7 +3,6 @@ package it.micheledichio.brightapi.service;
 import it.micheledichio.brightapi.dto.RealmDto;
 import it.micheledichio.brightapi.model.Realm;
 import it.micheledichio.brightapi.repository.RealmRepository;
-import it.micheledichio.brightapi.resource.UserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

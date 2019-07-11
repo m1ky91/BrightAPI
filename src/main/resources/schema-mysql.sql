@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS realm (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(32) NOT NULL,
+  description VARCHAR(255),
+  `key` CHAR(32),
+  UNIQUE KEY unique_name (name)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;;
